@@ -4,7 +4,7 @@
 class Database
 {
     private string $host = 'localhost';
-    private int $port = 3307;
+    private int $port = 3306;
     private string $db_name = 'galaxybdeng';
     private string $username = 'root';
     private string $password = '';
