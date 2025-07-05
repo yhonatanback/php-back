@@ -1,0 +1,718 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "GalaxyPay API",
+    "version": "1.0.0",
+    "description": "API RESTful para autenticación y registro de usuarios"
+  },
+  "servers": [
+    {
+      "url": "http://localhost/galaxy-api-eng/backendPhp/public/index.php",
+      "description": "Servidor local"
+    }
+  ],
+  "paths": {
+    "/login": {
+      "post": {
+        "summary": "Iniciar sesión",
+        "description": "Autentica un usuario mediante correo y contraseña",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "juan@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "123456"
+                  }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Inicio de sesión exitoso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6..."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Parámetros inválidos" },
+          "401": { "description": "Credenciales incorrectas" }
+        }
+      }
+    },
+   "/register": {
+  "post": {
+    "summary": "Registrar un nuevo usuario",
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "required": [
+              "email", "password", "name", "phone",
+              "documentNumber", "birthdate", "documentTypeId", "countryId"
+            ],
+            "properties": {
+              "email": { "type": "string", "format": "email", "example": "juan@example.com" },
+              "password": { "type": "string", "example": "Abc123@" },
+              "clientType": { "type": "string", "example": "people" },
+              "name": { "type": "string", "example": "Juan" },
+              "familyName": { "type": "string", "example": "Pérez" },
+              "phone": { "type": "string", "example": "3001234567" },
+              "address": { "type": "string", "example": "Calle 123" },
+              "addressSecondary": { "type": "string", "example": "Apto 4B" },
+              "postalCode": { "type": "string", "example": "110111" },
+              "countryId": { "type": "integer", "example": 1 },
+              "province": { "type": "string", "example": "Antioquia" },
+              "locality": { "type": "string", "example": "Medellín" },
+              "documentNumber": { "type": "string", "example": "1234567890" },
+              "birthdate": { "type": "string", "format": "date", "example": "1990-01-15" },
+              "documentTypeId": { "type": "integer", "example": 1 },
+              "id_employment_status": { "type": "integer", "example": 2 },
+              "id_fund_source": { "type": "integer", "example": 3 },
+              "id_job_sector": { "type": "integer", "example": 4 },
+              "is_us_citizen": { "type": "boolean", "example": false },
+              "is_us_tax_resident": { "type": "boolean", "example": false },
+              "fiscal_id": { "type": "string", "example": "NIF123456" },
+              "accept_terms_conditions": { "type": "boolean", "example": true },
+              "accept_security_policy": { "type": "boolean", "example": true },
+              "allow_visibility": { "type": "boolean", "example": true },
+              "allow_updates": { "type": "boolean", "example": false },
+              "allow_partnerships": { "type": "boolean", "example": true },
+              "residenceFiscalCountries": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "example": [1, 3]
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "201": {
+        "description": "Usuario registrado exitosamente",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": { "type": "string" },
+                "user_id": { "type": "integer" }
+              }
+            }
+          }
+        }
+      },
+      "400": { "description": "Faltan campos requeridos o inválidos" },
+      "409": { "description": "Email, documento o teléfono ya registrados" },
+      "500": { "description": "Error del servidor" }
+    }
+  }
+}
+,
+
+"/user/{documentNumber}": {
+  "get": {
+    "summary": "Consultar usuario por número de documento",
+    "description": "Devuelve un susuario por su número de documento",
+        
+    "tags": ["Usuarios"],
+    "parameters": [
+      {
+        "name": "documentNumber",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string", "example": "1234567890" },
+            "description": "Número de documento"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Usuario encontrado",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "integer", "example": 1 },
+                "email": { "type": "string", "example": "juan@example.com" },
+                "user_type": { "type": "string", "example": "people" },
+                "state": { "type": "string", "example": "enabled" },
+                "name": { "type": "string", "example": "Juan" },
+                "family_name": { "type": "string", "example": "Pérez" },
+                "document_number": { "type": "string", "example": "1234567890" },
+                "phone": { "type": "string", "example": "3001234567" },
+                "country_id": { "type": "integer", "example": 1 },
+                "address": { "type": "string", "example": "Calle 123" },
+                "address_secondary": { "type": "string", "example": "Apto 3B" },
+                "postal_code": { "type": "string", "example": "110111" },
+                "birthdate": { "type": "string", "format": "date", "example": "1990-01-01" },
+                "document_type_id": { "type": "integer", "example": 1 }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Usuario no encontrado",
+        "content": {
+          "application/json": {
+            "example": {
+              "error": "User not found"
+            }
+          }
+        }
+      }
+    }
+  }
+},
+
+
+    "/countries": {
+      "get": {
+        "summary": "Listar países disponibles",
+        "description": "Devuelve una lista de países activos con nombre, código ISO, bandera y código telefónico",
+        "responses": {
+          "200": {
+            "description": "Lista de países",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "integer", "example": 1 },
+                          "name": { "type": "string", "example": "Colombia" },
+                          "isoCode": { "type": "string", "example": "CO" },
+                          "flagUrl": { "type": "string", "example": "https://flagcdn.com/co.svg" },
+                          "dialingCode": { "type": "string", "example": "+57" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/data/personal-documents/{countryId}/{type}": {
+      "get": {
+        "summary": "Obtener tipos de documento por país y tipo de usuario",
+        "description": "Devuelve los documentos válidos para el país indicado y el tipo de cliente ('client' o 'business').",
+        "parameters": [
+          {
+            "name": "countryId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 1 },
+            "description": "ID del país"
+          },
+          {
+            "name": "type",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "enum": ["client", "business"], "example": "client" },
+            "description": "Tipo de usuario: client o business"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de tipos de documento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id":        { "type": "integer", "example": 1 },
+                          "name":      { "type": "string",  "example": "Cédula de Ciudadanía" },
+                          "acronym":   { "type": "string",  "example": "CC" },
+                          "user_type": { "type": "string",  "example": "client" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Parámetros inválidos" },
+          "404": { "description": "No se encontraron tipos de documento" }
+        }
+      }
+    },
+    "/validate/user": {
+      "post": {
+        "summary": "Validar existencia de email o teléfono",
+        "description": "Verifica si un email o número de teléfono ya están registrados.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "example": "email@example.com" },
+                  "phone": { "type": "string", "example": "3001234567" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado de validación",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "emailExists": { "type": "boolean", "example": false },
+                    "phoneExists": { "type": "boolean", "example": true }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud incorrecta",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string", "example": "Provide at least email or phone" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/validate/document": {
+      "post": {
+        "summary": "Validar existencia de documento",
+        "description": "Verifica si un número de documento de identidad ya está registrado en el sistema.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "documentNumber": {
+                    "type": "string",
+                    "example": "1234567890"
+                  }
+                },
+                "required": ["documentNumber"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado de validación del documento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "documentExists": {
+                      "type": "boolean",
+                      "example": false
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetro faltante o incorrecto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "documentNumber is required"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/forgot-password": {
+      "post": {
+        "summary": "Solicitar recuperación de contraseña",
+        "description": "Genera un token temporal para restablecer la contraseña del usuario",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "juan@example.com"
+                  }
+                },
+                "required": ["email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token generado correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Reset token generated" },
+                    "token":   { "type": "string", "example": "abc123xyz987..." }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Email no registrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string", "example": "Email not found" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reset-password": {
+  "post": {
+    "summary": "Restablecer contraseña con token",
+    "description": "Permite restablecer la contraseña de un usuario utilizando un token válido (válido por 1 hora).",
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "userId": {
+                "type": "integer",
+                "example": 1
+              },
+              "token": {
+                "type": "string",
+                "example": "abc123xyz456"
+              },
+              "newPassword": {
+                "type": "string",
+                "example": "NuevaClave@2025"
+              }
+            },
+            "required": ["userId", "token", "newPassword"]
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Contraseña cambiada exitosamente",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": { "type": "string", "example": "Password reset successfully" }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Token inválido o expirado",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": { "type": "string", "example": "Invalid or expired token" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+    },
+    "/locations/provinces": {
+      "get": {
+        "summary": "Obtener provincias por país",
+        "description": "Devuelve todas las provincias asociadas a un país.",
+        "parameters": [
+          {
+            "name": "country_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID del país"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de provincias del país",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "integer", "example": 10 },
+                      "name": { "type": "string", "example": "Antioquia" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "country_id es requerido"
+          }
+        }
+      }
+    },
+  "/locations/localities": {
+    "get": {
+      "summary": "Obtener localidades por provincia",
+      "description": "Devuelve todas las localidades asociadas a una provincia.",
+      "parameters": [
+        {
+          "name": "province_id",
+          "in": "query",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          },
+          "description": "ID de la provincia"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Lista de localidades de la provincia",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "integer", "example": 101 },
+                    "name": { "type": "string", "example": "Medellín" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "province_id es requerido"
+        }
+      }
+    }
+  },
+  "/employment-status": {
+      "get": {
+        "summary": "Obtener situaciones laborales",
+        "tags": ["EmploymentStatus"],
+        "responses": {
+          "200": {
+            "description": "Lista de situaciones laborales",
+            "content": {
+              "application/json": {
+                "example": [
+                  { "id": 1, "name": "Empleado", "description": "Trabajo en relación de dependencia" }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Crear situación laboral",
+        "tags": ["EmploymentStatus"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string" }
+                },
+                "required": ["name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Creado correctamente"
+          },
+          "400": {
+            "description": "Faltan datos"
+          }
+        }
+      }
+  },
+  "/job-sector": {
+      "get": {
+        "summary": "Obtener sectores de trabajo",
+        "tags": ["JobSector"],
+        "responses": {
+          "200": {
+            "description": "Lista de sectores",
+            "content": {
+              "application/json": {
+                "example": [
+                  { "id_job_sector": 1, "name": "Tecnología", "description": "Sector relacionado a software y hardware" }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Crear sector de trabajo",
+        "tags": ["JobSector"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string" }
+                },
+                "required": ["name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sector creado"
+          },
+          "400": {
+            "description": "Faltan datos"
+          }
+        }
+      }
+  },
+
+  "/fund-source": {
+      "get": {
+        "summary": "Obtener fuentes de fondos",
+        "tags": ["FundSource"],
+        "responses": {
+          "200": {
+            "description": "Lista de fuentes",
+            "content": {
+              "application/json": {
+                "example": [
+                  { "id_fund_source": 1, "name": "Ahorros", "description": "Fondos propios del usuario" }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Crear fuente de fondos",
+        "tags": ["FundSource"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string" }
+                },
+                "required": ["name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Fuente creada correctamente"
+          },
+          "400": {
+            "description": "Faltan datos"
+          }
+        }
+      }
+  }
+
+
+
+
+
+
+
+  }
+}
